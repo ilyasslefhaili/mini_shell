@@ -59,6 +59,9 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 		else if (token->token == 0)
 		{
 			temp = re->flags;
+			re->flags = ft_strjoin(re->flags, "-");
+			free(temp);
+			temp = re->flags;
 			re->flags = ft_strjoin(re->flags,token->value);
 			free(temp);
 			free(token);
