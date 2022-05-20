@@ -43,7 +43,6 @@ typedef struct TOKEN{
 
 typedef struct minishellpars
 {
-	char					*commande;
 	char					**flags;
 	struct minishellpars	*next_comande;
 	t_token					*output;
