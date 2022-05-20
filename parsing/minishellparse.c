@@ -55,11 +55,6 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 	token = ft_get_next_token(lexer);
 	while (token)
 	{
-		if (token->token == 0 && j == 0)
-		{
-			re->commande = token->value;
-			j++;
-		}
 		else if (token->token == 0)
 		{
 			temp = malloc(sizeof(char *) * (i + 2));
