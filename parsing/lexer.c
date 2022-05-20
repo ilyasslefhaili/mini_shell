@@ -113,12 +113,14 @@ char	*get_str(t_lexer *lexer)
 
 	i = 0;
 	c = ' ';
-	str = malloc(sizeof(char) * ft_count_str_for_value(&lexer->content[lexer->i], ' ') + 1);
+	str = malloc(sizeof(char) * ft_count_str(&lexer->content[lexer->i], ' ') + 1);
 	while (lexer->content[lexer->i] && lexer->c != c && lexer->c != '|' && lexer->c != '<' && lexer->c != '>')
 	{
 		str[i] = lexer->content[lexer->i];
 		if (lexer->c == '"')
 			c = '"';
+		else if (lexer->c == '\'')
+			c = '\'';
 		i++;
 		ft_advance(lexer);
 	}
@@ -127,6 +129,12 @@ char	*get_str(t_lexer *lexer)
 	{
 		temp = str;
 		str = ft_strjoin(str, "\"");
+		free(temp);
+	}
+	else if (c == '\'')
+	{
+		temp = str;
+		str = ft_strjoin(str, "'");
 		free(temp);
 	}
 	return (str);
@@ -162,9 +170,23 @@ int ft_count_str_for_value(char *content, char c)
 	i = 0;
 	j = 0;
 	while (content[i] && content[i] != c && content[i] != '|' && content[i] != '<' && content[i] != '>')
+		i++;
+	return (i);
+}
+
+int ft_count_str(char *content, char c)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	while (content[i] && content[i] != c && content[i] != '|' && content[i] != '<' && content[i] != '>')
 	{
 		if (content[i] == '"')
 			c = '"';
+		else if (content[i] == '\'')
+			c = '\'';
 		i++;
 	}
 	return (i);

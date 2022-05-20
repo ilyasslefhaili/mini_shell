@@ -70,5 +70,6 @@ t_head_c	*ft_get_for_exec(char *content);
 void	ft_init_head(t_head_c *head);
 void	ft_add_node(t_head_c *head, t_commande *commande);
 void	ft_add_commande(t_head_c *head, t_lexer *lexer);
+int		ft_count_str(char *content, char c);
 
 #endif
