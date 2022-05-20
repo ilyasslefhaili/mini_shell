@@ -12,24 +12,25 @@
 
 #include "minishell.h"
 
-char **combine_flags_with_command(t_commande *command)
-{
-    char **result;
-    if (command->flags[0] != '\0')
-    {
-        result = malloc(sizeof(char *) * 3);
-        result[0] = ft_strdup(command->commande);
-        result[1] = ft_strdup(command->flags);
-        result[2] = NULL;
-    }
-    else
-    {
-        result = malloc(sizeof(char *) * 2);
-        result[0] = ft_strdup(command->commande);
-        result[1] = NULL;
-    }
-    return (result);
-}
+// char **combine_flags_with_command(t_commande *command)
+// {
+//     char **result;
+//     if (command->flags[0] != '\0')
+//     {
+//         result = malloc(sizeof(char *) * 3);
+//         result[0] = ft_strdup(command->commande);
+//         result[1] = ft_strdup(command->flags);
+//         result[2] = NULL;
+//     }
+//     else
+//     {
+//         result = malloc(sizeof(char *) * 2);
+//         result[0] = ft_strdup(command->commande);
+//         result[1] = NULL;
+//     }
+//     return (result);
+// }
+
 int main(int ac, char **av, char **env)
 {
     (void)ac;
@@ -50,8 +51,15 @@ int main(int ac, char **av, char **env)
             while (command->first_c)
             {
                 printf("%s\n", command->first_c->commande);
-                if (command->first_c->flags[0] != '\0')
-                    printf("%s\n", command->first_c->flags);
+                if (command->first_c->flags[0])
+                {
+                    int i = 0;
+                    while (command->first_c->flags[i] != NULL)
+                    {
+                        printf("%s\n", command->first_c->flags[i]);
+                        i++;
+                    }
+                }
                 command->first_c = command->first_c->next_comande;
             }
         }

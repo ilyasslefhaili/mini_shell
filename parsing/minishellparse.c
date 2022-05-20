@@ -40,14 +40,18 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 	t_token		*token;
 	int			j;
 	t_commande	*re;
-	char *temp;
+	char **temp;
+	int i = 1;
+	int e;
 
+	e = 0;
 	j = 0;
 	re = malloc(sizeof(t_commande));
 	re->commande = NULL;
 	re->input = NULL;
 	re->output = NULL;
-	re->flags = ft_strdup("");
+	re->flags = malloc(sizeof(char *));
+	re->flags[0] = NULL;
 	token = ft_get_next_token(lexer);
 	while (token)
 	{
@@ -58,13 +62,22 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 		}
 		else if (token->token == 0)
 		{
-			temp = re->flags;
-			re->flags = ft_strjoin(re->flags, "-");
-			free(temp);
-			temp = re->flags;
-			re->flags = ft_strjoin(re->flags,token->value);
-			free(temp);
-			free(token);
+			temp = malloc(sizeof(char *) * (i + 2));
+			if (e > 0)
+			{
+				e = 0;
+				while (e < i)
+				{
+					temp[e] = re->flags[e];
+					e++;
+				}
+				i++;
+			}
+			temp[e] = token->value;
+			temp[e + 1] = NULL;
+			free(re->flags);
+			re->flags = temp;
+			e++;
 		}
 		else if (token->token == 2 || token->token == 4)
 			re->output = token;
