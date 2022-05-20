@@ -20,3 +20,4 @@ fclean :
 		cd execution && make fclean && cd ..
 		cd libft && make fclean && cd ..
 		cd parsing && make fclean && cd ..
+

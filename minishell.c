@@ -50,13 +50,12 @@ int main(int ac, char **av, char **env)
             command = ft_get_for_exec(cmd);
             while (command->first_c)
             {
-                printf("%s\n", command->first_c->commande);
                 if (command->first_c->flags[0])
                 {
                     int i = 0;
                     while (command->first_c->flags[i] != NULL)
                     {
-                        printf("%s\n", command->first_c->flags[i]);
+                        printf("%s  ", command->first_c->flags[i]);
                         i++;
                     }
                 }
