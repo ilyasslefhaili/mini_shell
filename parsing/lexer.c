@@ -78,8 +78,6 @@ char	*ft_her_app(t_lexer *lexer)
 	ft_advance(lexer);
 	ft_advance(lexer);
 	ft_skip_spaces(lexer);
-	if (lexer->c == '"' || lexer->c == '\'')
-		return (ft_collect_string(lexer));
 	if (lexer->c == '|' || lexer->c == '<' || lexer->c == '>' || lexer->c == ')' || lexer->c == '(')
 	{
 		write(2, "minishell: syntax error near unexpected token `", 48);
@@ -88,8 +86,10 @@ char	*ft_her_app(t_lexer *lexer)
 		else
 			write(2, &lexer->c, 1);
 		write(2, "'\n", 2);
-		exit (1);
+		return (NULL);
 	}
+	if (lexer->c == '"' || lexer->c == '\'')
+		return (ft_collect_string(lexer));
 	c = ' ';
 	str = malloc(sizeof(char) * ft_count_str_for_value(&lexer->content[lexer->i], c) + 1);
 	while (lexer->content[lexer->i] && lexer->c != c && lexer->c != '|' && lexer->c != '<' && lexer->c != '>')
@@ -211,7 +211,7 @@ char *ft_get_value(t_lexer *lexer)
 		else
 			write(2, &lexer->c, 1);
 		write(2, "'\n", 2);
-		exit (1);
+		return (NULL);
 	}
 	c = ' ';
 	str = malloc(sizeof(char) * ft_count_str_for_value(&lexer->content[lexer->i], c) + 1);

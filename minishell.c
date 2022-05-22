@@ -35,7 +35,7 @@ int main(int ac, char **av, char **env)
 {
     (void)ac;
     (void)av;
-    //char **temp;
+
     t_list *env_list;
     env_list = get_env_list(env);
     t_head_c *command;
@@ -48,18 +48,24 @@ int main(int ac, char **av, char **env)
         if (*cmd)
         {
             command = ft_get_for_exec(cmd);
-            while (command->first_c)
+            if (command)
             {
-                if (command->first_c->flags[0])
+                while (command->first_c)
                 {
-                    int i = 0;
-                    while (command->first_c->flags[i] != NULL)
+                    if (command->first_c->flags[0])
                     {
-                        printf("%s  ", command->first_c->flags[i]);
-                        i++;
+                        int i = 0;
+                        while (command->first_c->flags[i] != NULL)
+                        {
+                            printf("%s  ", command->first_c->flags[i]);
+                            i++;
+                        }
                     }
+                    if (command->first_c->output)
+                        printf("%s", command->first_c->output->value);
+                    printf("\n");
+                    command->first_c = command->first_c->next_comande;
                 }
-                command->first_c = command->first_c->next_comande;
             }
         }
     }

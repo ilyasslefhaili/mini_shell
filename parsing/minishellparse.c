@@ -35,6 +35,17 @@ void	ft_add_node(t_head_c *head, t_commande *commande)
 	commande->next_comande = NULL;
 }
 
+void ft_free(t_head_c *head)
+{
+	t_commande	*temp;
+
+	while (head->first_c != NULL)
+	{
+		temp = head->first_c;
+		head->first_c = head->first_c->next_comande;
+		free(temp);
+	}
+}
 void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 {
 	t_token		*token;
@@ -43,6 +54,7 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 	char **temp;
 	int i = 1;
 	int e;
+	int fd;
 
 	e = 0;
 	j = 0;
@@ -74,9 +86,25 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 			e++;
 		}
 		else if (token->token == 2 || token->token == 4)
+		{
+			if (token->value == NULL)
+			{
+				ft_free(head);
+				return ;
+			}
 			re->output = token;
+			fd = open(token->value, O_CREAT | O_RDWR, 0664);
+			close(fd);
+		}
 		else if (token->token == 3 || token->token == 1)
+		{
+			if (token->value == NULL)
+			{
+				ft_free(head);
+				return ;
+			}
 			re->input = token;
+		}
 		else if (token->token == 5)
 		{
 			free(token);
@@ -98,7 +126,11 @@ t_head_c	*ft_get_for_exec(char *content)
 	i = 0;
 	lexer = ft_init_lexer(content);
 	while (lexer->content[lexer->i])
+	{
 		ft_add_commande(head_of_commande, lexer);
+		if (head_of_commande->first_c == NULL)
+			return (NULL);
+	}
 	return (head_of_commande);
 }
 
