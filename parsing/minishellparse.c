@@ -68,6 +68,11 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 	{
 		if (token->token == 0)
 		{
+			if (token->value == NULL)
+			{
+				ft_free(head);
+				return ;
+			}
 			temp = malloc(sizeof(char *) * (i + 2));
 			if (e > 0)
 			{
@@ -133,27 +138,3 @@ t_head_c	*ft_get_for_exec(char *content)
 	}
 	return (head_of_commande);
 }
-
-// int main(int ac, char **av)
-// {
-// 	t_head_c *l;
-
-// 	ac = 0;
-// 	(void)av;
-// 	char *cmd;
-// 	while (1)
-// 	{
-// 		cmd = readline("Minishell$>");
-// 		l = ft_get_for_exec(cmd);
-// 		while (l->first_c)
-// 		{
-// 			printf("%s    ", l->first_c->commande);
-// 			if (l->first_c->input)
-// 				printf("%s  ", l->first_c->input->value);
-// 			if (l->first_c->output)
-// 				printf("%s", l->first_c->output->value);
-// 			l->first_c = l->first_c->next_comande;
-// 			printf("\n");
-// 		}
-// 	}
-// }

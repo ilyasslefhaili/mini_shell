@@ -148,7 +148,8 @@ char	*ft_collect_string(t_lexer *lexer)
 
 	i = 0;
 	c = lexer->c;
-	ft_advance(lexer);
+	while (lexer->c == c)
+		ft_advance(lexer);
 	str = malloc(sizeof(char) * ft_count_str_for_value(&lexer->content[lexer->i], c) + 1);
 	while (lexer->c != c && lexer->content[lexer->i])
 	{
@@ -156,8 +157,10 @@ char	*ft_collect_string(t_lexer *lexer)
 		i++;
 		ft_advance(lexer);
 	}
+	if (lexer->c != c)
+		return (NULL);
 	str[i] = '\0';
-	if (lexer->c == c)
+	while (lexer->c == c)
 		ft_advance(lexer);
 	return (str);
 }
