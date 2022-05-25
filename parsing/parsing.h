@@ -66,15 +66,14 @@ int		ft_count_str_for_value(char *content, char c);
 void	ft_skip_spaces(t_lexer	*lexer);
 t_lexer	*ft_init_lexer(char *content);
 t_token	*ft_get_next_token(t_lexer *lexer);
-char	*ft_collect_string(t_lexer *lexer);
-char	*get_str(t_lexer *lexer);
-char	*ft_her_app(t_lexer *lexer);
+char	*ft_collect_string(t_lexer *lexer, char c);
+// char	*get_str(t_lexer *lexer);
+// char	*ft_her_app(t_lexer *lexer);
 char	*ft_get_value(t_lexer *lexer);
-char	*convert_to_str(char **av);
 t_head_c	*ft_get_for_exec(char *content);
 void	ft_init_head(t_head_c *head);
 void	ft_add_node(t_head_c *head, t_commande *commande);
 void	ft_add_commande(t_head_c *head, t_lexer *lexer);
-int		ft_count_str(char *content, char c);
+char	*ft_get_str_without_quote(t_lexer *lexer);
 
 #endif
