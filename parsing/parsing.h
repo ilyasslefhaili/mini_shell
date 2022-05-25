@@ -40,14 +40,18 @@ typedef enum{
 typedef struct TOKEN{
 	t_type token;
 	char *value;
+	struct TOKEN *next;
 }t_token;
 
-typedef struct minishellpars
-{
+typedef struct t_token_head{
+	t_token	*first_token;
+}t_token_head;
+
+typedef struct minishellpars{
 	char					**flags;
 	struct minishellpars	*next_comande;
-	t_token					*output;
-	t_token					*input;
+	t_token_head			*output;
+	t_token_head			*input;
 }t_commande;
 
 typedef struct head

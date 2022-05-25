@@ -167,8 +167,8 @@ char	*ft_collect_string(t_lexer *lexer)
 
 int ft_count_str_for_value(char *content, char c)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	j = 0;

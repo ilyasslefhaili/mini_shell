@@ -61,8 +61,14 @@ int main(int ac, char **av, char **env)
                             i++;
                         }
                     }
-                    if (command->first_c->output)
-                        printf("%s", command->first_c->output->value);
+                    if (command->first_c->output->first_token)
+                    {
+                        while(command->first_c->output->first_token)
+                        {
+                            printf("%s ",command->first_c->output->first_token->value);
+                            command->first_c->output->first_token = command->first_c->output->first_token->next;
+                        }
+                    }
                     printf("\n");
                     command->first_c = command->first_c->next_comande;
                 }

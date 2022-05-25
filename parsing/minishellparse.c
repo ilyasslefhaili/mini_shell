@@ -18,6 +18,21 @@ void	ft_init_head(t_head_c *head)
 	head->taille = 0;
 }
 
+void	ft_add_red(t_token_head *head, t_token *t)
+{
+	t_token	*temp;
+
+	temp = head->first_token;
+	if (temp == NULL)
+	{
+		head->first_token = t;
+		return;
+	}
+	while (temp->next)
+		temp = temp->next;
+	temp->next = t;
+}
+
 void	ft_add_node(t_head_c *head, t_commande *commande)
 {
 	t_commande	*temp;
@@ -46,6 +61,7 @@ void ft_free(t_head_c *head)
 		free(temp);
 	}
 }
+
 void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 {
 	t_token		*token;
@@ -54,13 +70,14 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 	char **temp;
 	int i = 1;
 	int e;
-	int fd;
 
 	e = 0;
 	j = 0;
 	re = malloc(sizeof(t_commande));
-	re->input = NULL;
-	re->output = NULL;
+	re->input = malloc(sizeof(t_token_head));
+	re->input->first_token = NULL;
+	re->output = malloc(sizeof(t_token_head));
+	re->output->first_token = NULL;
 	re->flags = malloc(sizeof(char *));
 	re->flags[0] = NULL;
 	token = ft_get_next_token(lexer);
@@ -97,9 +114,8 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 				ft_free(head);
 				return ;
 			}
-			re->output = token;
-			fd = open(token->value, O_CREAT | O_RDWR, 0664);
-			close(fd);
+			
+			ft_add_red(re->output, token);
 		}
 		else if (token->token == 3 || token->token == 1)
 		{
@@ -108,7 +124,7 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 				ft_free(head);
 				return ;
 			}
-			re->input = token;
+			ft_add_red(re->input, token);
 		}
 		else if (token->token == 5)
 		{
