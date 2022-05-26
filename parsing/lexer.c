@@ -254,10 +254,12 @@ t_token	*ft_get_next_token(t_lexer *lexer)
 // 		ft_advance(lexer);
 // 	return (str);
 // }
+
 char	*ft_get_value(t_lexer *lexer)
 {
-	char *str;
-	char *temp;
+	char	*str;
+	char	*temp;
+	char	*s;
 
 	str = ft_strdup("");
 	ft_skip_spaces(lexer);
@@ -266,15 +268,23 @@ char	*ft_get_value(t_lexer *lexer)
 		if (lexer->c == '\'')
 		{
 			temp = str;
-			str = ft_strjoin(str, ft_collect_string(lexer, '\''));
+			s = ft_collect_string(lexer, '\'');
+			if (s == NULL)
+				return (NULL);
+			str = ft_strjoin(str, s);
 			free(temp);
+			free(s);
 			ft_advance(lexer);
 		}
 		else if (lexer->c == '"')
 		{
 			temp = str;
-			str = ft_strjoin(str, ft_collect_string(lexer, '"'));
+			s = ft_collect_string(lexer, '"');
+			if (s == NULL)
+				return (NULL);
+			str = ft_strjoin(str, s);
 			free(temp);
+			free(s);
 			ft_advance(lexer);
 		}
 		else
@@ -284,6 +294,8 @@ char	*ft_get_value(t_lexer *lexer)
 			free(temp);
 		}
 	}
+	if (str[0] == '\0')
+		return (NULL);
 	return(str);
 }
 
@@ -309,6 +321,7 @@ char	*ft_collect_string(t_lexer *lexer, char c)
 	char	*temp;
 
 	str = ft_strdup("");
+	ft_advance(lexer);
 	while(lexer->content[lexer->i] && lexer->c != c)
 	{
 		temp = str;
@@ -316,5 +329,7 @@ char	*ft_collect_string(t_lexer *lexer, char c)
 		free(temp);
 		ft_advance(lexer);
 	}
+	if (lexer->c != c)
+		return (NULL);
 	return (str);
 }

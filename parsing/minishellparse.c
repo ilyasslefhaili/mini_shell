@@ -68,11 +68,12 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 	int			j;
 	t_commande	*re;
 	char **temp;
-	int i = 1;
+	int i;
 	int e;
 
 	e = 0;
 	j = 0;
+	i = 1;
 	re = malloc(sizeof(t_commande));
 	re->input = malloc(sizeof(t_token_head));
 	re->input->first_token = NULL;
@@ -87,6 +88,7 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 		{
 			if (token->value == NULL)
 			{
+				printf("minishell:syntax error\n");
 				ft_free(head);
 				return ;
 			}
@@ -111,16 +113,17 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 		{
 			if (token->value == NULL)
 			{
+				printf("minishell:syntax error\n");
 				ft_free(head);
 				return ;
 			}
-			
 			ft_add_red(re->output, token);
 		}
 		else if (token->token == 3 || token->token == 1)
 		{
 			if (token->value == NULL)
 			{
+				printf("minishell:syntax error\n");
 				ft_free(head);
 				return ;
 			}
@@ -129,6 +132,13 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 		else if (token->token == 5)
 		{
 			free(token);
+			ft_skip_spaces(lexer);
+			if (lexer->content[lexer->i] == '\0')
+			{
+				printf("minishell:syntax error\n");
+				ft_free(head);
+				return ;
+			}
 			break ;
 		}
 		token = ft_get_next_token(lexer);
