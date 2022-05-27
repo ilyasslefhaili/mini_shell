@@ -287,6 +287,8 @@ char	*ft_get_value(t_lexer *lexer)
 			free(s);
 			ft_advance(lexer);
 		}
+		else if (lexer->i < ft_strlen(lexer->content) - 1 && lexer->c == '$' && (lexer->content[lexer->i + 1] == '\'' || lexer->content[lexer->i + 1] == '"'))
+			ft_advance(lexer);
 		else
 		{
 			temp = str;
@@ -303,10 +305,35 @@ char	*ft_get_str_without_quote(t_lexer *lexer)
 {
 	char	*str;
 	char	*temp;
+	char	*s;
 
 	str = ft_strdup("");
+	s = ft_strdup("");
 	while (lexer->content[lexer->i] && lexer->c != ' ' && lexer->c != '\'' && lexer->c != '"' && lexer->c != '>' && lexer->c != '<' && lexer->c != '|')
 	{
+		if (lexer->c == '$' && lexer->i < ft_strlen(lexer->content) - 1 && lexer->content[lexer->i + 1] != ' ')
+		{
+			ft_advance(lexer);
+			while (lexer->content[lexer->i] && lexer->c != ' ' && lexer->c != '$')
+			{
+				temp = s;
+				s = ft_strjoin(s, &lexer->c);
+				free(temp);
+				ft_advance(lexer);
+			}
+			if (getenv(s))
+			{
+				temp = str;
+				str = ft_strjoin(str, getenv(s));
+				free(temp);
+			}
+			else
+			{
+				temp = str;
+				str = ft_strjoin(str, "\n");
+				free(temp);
+			}
+		}
 		temp = str;
 		str = ft_strjoin(str, &lexer->c);
 		free(temp);
@@ -319,15 +346,43 @@ char	*ft_collect_string(t_lexer *lexer, char c)
 {
 	char	*str;
 	char	*temp;
+	char	*s;
 
 	str = ft_strdup("");
+	s = ft_strdup("");
 	ft_advance(lexer);
 	while(lexer->content[lexer->i] && lexer->c != c)
 	{
+		if (c == '"' && lexer->c == '$' && lexer->i < ft_strlen(lexer->content) - 1 && lexer->content[lexer->i + 1] != ' ')
+		{
+			ft_advance(lexer);
+			while (lexer->content[lexer->i] && lexer->c != '"' && lexer->c != ' ' && lexer->c != '$')
+			{
+				temp = s;
+				s = ft_strjoin(s, &lexer->c);
+				free(temp);
+				ft_advance(lexer);
+			}
+			if (getenv(s))
+			{
+				temp = str;
+				str = ft_strjoin(str, getenv(s));
+				free(temp);
+			}
+			else
+			{
+				temp = str;
+				str = ft_strjoin(str, "\n");
+				free(temp);
+			}
+		}
 		temp = str;
-		str = ft_strjoin(str, &lexer->c);
-		free(temp);
-		ft_advance(lexer);
+		if (lexer->c != '"')
+		{
+			str = ft_strjoin(str, &lexer->c);
+			free(temp);
+			ft_advance(lexer);
+		}
 	}
 	if (lexer->c != c)
 		return (NULL);

@@ -70,6 +70,7 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 	char **temp;
 	int i;
 	int e;
+	int k = 0;
 
 	e = 0;
 	j = 0;
@@ -133,7 +134,7 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 		{
 			free(token);
 			ft_skip_spaces(lexer);
-			if (lexer->content[lexer->i] == '\0')
+			if (lexer->content[lexer->i] == '\0' || k == 0)
 			{
 				printf("minishell:syntax error\n");
 				ft_free(head);
@@ -141,6 +142,7 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 			}
 			break ;
 		}
+		k++;
 		token = ft_get_next_token(lexer);
 	}
 	ft_add_node(head, re);
