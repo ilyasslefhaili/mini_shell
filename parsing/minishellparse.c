@@ -93,22 +93,18 @@ void	ft_add_commande(t_head_c *head, t_lexer *lexer)
 				ft_free(head);
 				return ;
 			}
-			temp = malloc(sizeof(char *) * (i + 2));
-			if (e > 0)
+			temp = malloc(sizeof(char *) * (i + 1));
+			e = 0;
+			while (e < i - 1)
 			{
-				e = 0;
-				while (e < i)
-				{
-					temp[e] = re->flags[e];
-					e++;
-				}
-				i++;
-			}
+				temp[e] = re->flags[e];
+				e++;
+			}	
+			i++;
 			temp[e] = token->value;
 			temp[e + 1] = NULL;
 			free(re->flags);
 			re->flags = temp;
-			e++;
 		}
 		else if (token->token == 2 || token->token == 4)
 		{
