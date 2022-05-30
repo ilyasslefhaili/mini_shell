@@ -1,0 +1,8 @@
+128 failed to execute a program in a subprocess
+0 exited succefully
+126 permession problem or command not excutable
+127 command not found
+130 ctrl-c inside a child 
+1 ctrl-c inside a parent;
+131 sigquit
+eof 0

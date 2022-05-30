@@ -6,7 +6,7 @@
 /*   By: ytouate <ytouate@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 10:57:34 by ilefhail          #+#    #+#             */
-/*   Updated: 2022/05/19 12:04:58 by ytouate          ###   ########.fr       */
+/*   Updated: 2022/05/29 16:39:44 by ytouate          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	ft_skip_spaces(t_lexer	*lexer)
 		ft_advance(lexer);
 }
 
-t_token	*ft_get_next_token(t_lexer *lexer)
+t_token	*ft_get_next_token(t_lexer *lexer, t_list *env_list)
 {
 	while (lexer->i < ft_strlen(lexer->content))
 	{
@@ -53,48 +53,49 @@ t_token	*ft_get_next_token(t_lexer *lexer)
 			return (ft_init_token(T_PIPE, ""));
 		}
 		else if (lexer->c == '"' || lexer->c == '\'')
-			return (ft_init_token(T_WORD, ft_get_value(lexer)));
+			return (ft_init_token(T_WORD, ft_get_value(lexer, env_list)));
 		else if (ft_strncmp(&lexer->content[lexer->i], "<<", 2) == 0)
 		{
 			ft_advance(lexer);
 			ft_advance(lexer);
 			ft_skip_spaces(lexer);
-			if (lexer->content[lexer->i] == '\0')
+			if (lexer->content[lexer->i] == '\0' || lexer->c == '<' || lexer->c == '>')
 				return (ft_init_token(T_HERDOC, NULL));
-			return (ft_init_token(T_HERDOC, ft_get_value(lexer)));
+			return (ft_init_token(T_HERDOC, ft_get_value(lexer, env_list)));
 		}
 		else if (ft_strncmp(&lexer->content[lexer->i], ">>", 2) == 0)
 		{
 			ft_advance(lexer);
 			ft_advance(lexer);
 			ft_skip_spaces(lexer);
-			if (lexer->content[lexer->i] == '\0')
+			if (lexer->content[lexer->i] == '\0' || lexer->c == '<' || lexer->c == '>')
 				return (ft_init_token(T_HERDOC, NULL));
-			return (ft_init_token(T_APPEND, ft_get_value(lexer)));
+			return (ft_init_token(T_APPEND, ft_get_value(lexer, env_list)));
 		}
 		else if (lexer->c == '<')
 		{
 			ft_skip_spaces(lexer);
-			if (lexer->content[lexer->i] == '\0')
+			ft_advance(lexer);
+			if (lexer->content[lexer->i] == '\0' || lexer->c == '<' || lexer->c == '>')
 				return (ft_init_token(T_HERDOC, NULL));
-			return (ft_init_token(T_IN, ft_get_value(lexer)));
+			return (ft_init_token(T_IN, ft_get_value(lexer, env_list)));
 		}
 		else if (lexer->c == '>')
 		{
 			ft_advance(lexer);
 			ft_skip_spaces(lexer);
-			if (lexer->content[lexer->i] == '\0')
+			if (lexer->content[lexer->i] == '\0' || lexer->c == '<' || lexer->c == '>')
 				return (ft_init_token(T_HERDOC, NULL));
-			return (ft_init_token(T_OUT, ft_get_value(lexer)));
+			return (ft_init_token(T_OUT, ft_get_value(lexer, env_list)));
 		}
 		else
-			return (ft_init_token(T_WORD, ft_get_value(lexer)));
+			return (ft_init_token(T_WORD, ft_get_value(lexer, env_list)));
 	}
 	return (NULL);
 }
 
 
-char	*ft_get_value(t_lexer *lexer)
+char	*ft_get_value(t_lexer *lexer, t_list *env_list)
 {
 	char	*str;
 	char	*temp;
@@ -107,7 +108,7 @@ char	*ft_get_value(t_lexer *lexer)
 		if (lexer->c == '\'')
 		{
 			temp = str;
-			s = ft_collect_string(lexer, '\'');
+			s = ft_collect_string(lexer, '\'', env_list);
 			if (s == NULL)
 				return (NULL);
 			str = ft_strjoin(str, s);
@@ -118,7 +119,7 @@ char	*ft_get_value(t_lexer *lexer)
 		else if (lexer->c == '"')
 		{
 			temp = str;
-			s = ft_collect_string(lexer, '"');
+			s = ft_collect_string(lexer, '"', env_list);
 			if (s == NULL)
 				return (NULL);
 			str = ft_strjoin(str, s);
@@ -130,31 +131,34 @@ char	*ft_get_value(t_lexer *lexer)
 			ft_advance(lexer);
 		else
 		{
+			s = ft_get_str_without_quote(lexer, env_list);
 			temp = str;
-			str = ft_strjoin(str, ft_get_str_without_quote(lexer));
+			str = ft_strjoin(str, s);
+			free(s); 
 			free(temp);
 		}
 	}
 	return(str);
 }
 
-char	*ft_get_str_without_quote(t_lexer *lexer)
+char	*ft_get_str_without_quote(t_lexer *lexer, t_list *env_list)
 {
 	char	*str;
 	char	*temp;
 	char	*s;
 
 	str = ft_strdup("");
-	s = ft_strdup("");
 	while (lexer->content[lexer->i] && lexer->c != ' ' && lexer->c != '\'' && lexer->c != '"' && lexer->c != '>' && lexer->c != '<' && lexer->c != '|')
 	{
-		if (lexer->c == '$' && lexer->i < ft_strlen(lexer->content) - 1 && lexer->content[lexer->i + 1] != ' ')
+		s = ft_strdup("");
+		if (lexer->c == '$' && lexer->i < ft_strlen(lexer->content) - 1 &&
+				 (ft_isalnum(lexer->content[lexer->i + 1]) != 0|| ft_isalpha(lexer->content[lexer->i + 1]) != 0 || lexer->content[lexer->i + 1] == '?'))
 		{
 			ft_advance(lexer);
 			if (lexer->c == '?')
 			{
 				temp = str;
-				str = ft_strjoin(str, "0");
+				str = ft_strjoin(str, ft_itoa(get_exit_code()));
 				free(temp);
 				ft_advance(lexer);
 			}
@@ -168,48 +172,52 @@ char	*ft_get_str_without_quote(t_lexer *lexer)
 					free(temp);
 					ft_advance(lexer);
 				}
-				if (getenv(s))
+				if (ft_get_env_val(env_list, s))
 				{
 					temp = str;
-					str = ft_strjoin(str, getenv(s));
+					str = ft_strjoin(str, ft_get_env_val(env_list, s));
 					free(temp);
 				}
 				else
 				{
 					temp = str;
-					str = ft_strjoin(str, "\n");
+					str = ft_strjoin(str, "");
 					free(temp);
 				}
 			}
 		}
-		temp = str;
-		if (lexer->c == '"' || lexer->c == '\'')
-			break ;
-		str = ft_strjoin(str, &lexer->c);
-		free(temp);
-		ft_advance(lexer);
+		else
+		{
+			temp = str;
+			str = ft_strjoin(str, &lexer->c);
+			free(temp);
+			ft_advance(lexer);
+			free(s);
+		}
 	}
 	return(str);
 }
 
-char	*ft_collect_string(t_lexer *lexer, char c)
+char	*ft_collect_string(t_lexer *lexer, char c, t_list *env_list)
 {
 	char	*str;
 	char	*temp;
 	char	*s;
 
 	str = ft_strdup("");
-	s = ft_strdup("");
+	
 	ft_advance(lexer);
 	while(lexer->content[lexer->i] && lexer->c != c)
 	{
-		if (c == '"' && lexer->c == '$' && lexer->i < ft_strlen(lexer->content) - 1 && lexer->content[lexer->i + 1] != ' ')
+		s = ft_strdup("");
+		if (c == '"' && lexer->c == '$' && lexer->i < ft_strlen(lexer->content) - 1 &&
+				 (ft_isalnum(lexer->content[lexer->i + 1]) != 0|| ft_isalpha(lexer->content[lexer->i + 1]) != 0 || lexer->content[lexer->i + 1] == '?'))
 		{
 			ft_advance(lexer);
 			if (lexer->c == '?')
 			{
 				temp = str;
-				str = ft_strjoin(str, "0");
+				str = ft_strjoin(str, ft_itoa(get_exit_code()));
 				free(temp);
 				ft_advance(lexer);
 			}
@@ -223,16 +231,16 @@ char	*ft_collect_string(t_lexer *lexer, char c)
 					free(temp);
 					ft_advance(lexer);
 				}
-				if (getenv(s))
+				if (ft_get_env_val(env_list, s))
 				{
 					temp = str;
-					str = ft_strjoin(str, getenv(s));
+					str = ft_strjoin(str, ft_get_env_val(env_list, s));
 					free(temp);
 				}
 				else
 				{
 					temp = str;
-					str = ft_strjoin(str, "\n");
+					str = ft_strjoin(str, "");
 					free(temp);
 				}
 			}
@@ -243,6 +251,7 @@ char	*ft_collect_string(t_lexer *lexer, char c)
 			str = ft_strjoin(str, &lexer->c);
 			free(temp);
 			ft_advance(lexer);
+			free(s);
 		}
 	}
 	if (lexer->c != c)
