@@ -84,19 +84,98 @@ void ft_free(t_head_c *head)
 	}
 }
 
+char	**ft_replace(char **av, int i, char *value)
+{
+	int		e;
+	char	**temp;
+
+	temp = malloc(sizeof(char *) * (i + 1));
+	e = 0;
+	while (e < i - 1)
+	{
+		temp[e] = av[e];
+		e++;
+	}	
+	temp[e] = value;
+	temp[e + 1] = NULL;
+	free(av);
+	return (temp);
+}
+
+int	ft_syntax(char *value, t_token *t)
+{
+	if (value == NULL)
+	{
+		free(t);
+		printf("minishell:syntax error\n");
+		return (1);
+	}
+	return (0);
+}
+
+int		ft_rederictions(t_commande *re, t_token *token)
+{
+	if (ft_syntax(token->value, token) == 1)
+		return (1);
+	if (token->token == 1 || token->token == 3)
+		ft_add_red(re->input, token);
+	else
+		ft_add_red(re->output, token);
+	return (0);
+}
+
+int		ft_check_pipe(t_lexer *lexer, t_token *token, int k)
+{
+	free(token);
+	ft_skip_spaces(lexer);
+	if (lexer->content[lexer->i] == '\0' || k == 0)
+	{
+		printf("minishell:syntax error\n");
+		return (1);
+	}
+	return (0);
+}
+
+int		ft_fill_node(t_commande *re, t_lexer *lexer, t_list *env_list)
+{
+	int			i;
+	int			k;
+	t_token		*token;
+
+	token = ft_get_next_token(lexer, env_list);
+	i = 1;
+	k = 0;
+	while (token)
+	{
+		if (token->token == 0)
+		{
+			if (ft_syntax(token->value, token) == 1)
+				return (1);
+			re->flags = ft_replace(re->flags, i, token->value);
+			i++;
+			free(token);
+		}
+		else if (token->token >= 1 && token->token <= 4)
+		{
+			if (ft_rederictions(re, token) == 1)
+				return (1);
+		}
+		else if (token->token == 5)
+		{
+			if (ft_check_pipe(lexer, token, k) == 1)
+				return (1);
+			break ;
+		}
+		k++;
+		token = ft_get_next_token(lexer, env_list);
+	}
+	return (0);
+}
+
 int	ft_add_commande(t_head_c *head, t_lexer *lexer, t_list *env_list)
 {
-	t_token		*token;
-	int			j;
 	t_commande	*re;
-	char **temp;
-	int i;
-	int e;
-	int k = 0;
 
-	e = 0;
-	j = 0;
-	i = 1;
 	re = malloc(sizeof(t_commande));
 	re->input = malloc(sizeof(t_token_head));
 	re->input->first_token = NULL;
@@ -104,63 +183,8 @@ int	ft_add_commande(t_head_c *head, t_lexer *lexer, t_list *env_list)
 	re->output->first_token = NULL;
 	re->flags = malloc(sizeof(char *));
 	re->flags[0] = NULL;
-	token = ft_get_next_token(lexer, env_list);
-	while (token)
-	{
-		if (token->token == 0)
-		{
-			if (token->value == NULL)
-			{
-				printf("minishell:syntax error\n");
-				return (1);
-			}
-			temp = malloc(sizeof(char *) * (i + 1));
-			e = 0;
-			while (e < i - 1)
-			{
-				temp[e] = re->flags[e];
-				e++;
-			}	
-			i++;
-			temp[e] = token->value;
-			temp[e + 1] = NULL;
-			free(re->flags);
-			re->flags = temp;
-			free(token);
-		}
-		else if (token->token == 2 || token->token == 4)
-		{
-			if (token->value == NULL)
-			{
-				printf("minishell:syntax error\n");
-				return (1);
-			}
-			ft_add_red(re->output, token);
-		}
-		else if (token->token == 3 || token->token == 1)
-		{
-			if (token->value == NULL)
-			{
-				free(token);
-				printf("minishell:syntax error\n");
-				return (1);
-			}
-			ft_add_red(re->input, token);
-		}
-		else if (token->token == 5)
-		{
-			free(token);
-			ft_skip_spaces(lexer);
-			if (lexer->content[lexer->i] == '\0' || k == 0)
-			{
-				printf("minishell:syntax error\n");
-				return (1);
-			}
-			break ;
-		}
-		k++;
-		token = ft_get_next_token(lexer, env_list);
-	}
+	if (ft_fill_node(re, lexer, env_list) == 1)
+		return (1);
 	ft_add_node(head, re);
 	return (0);
 }
