@@ -22,7 +22,7 @@ void	read_for_herdoc(int *fd, t_commande *cmd)
 	while (1)
 	{
 		result = readline(">");
-		if (result == NULL || ft_strcmp(result, cmd->input->first_token->value) == 0)
+		if (result == NULL || ft_strcmp(result, cmd->redi->first_token->value) == 0)
 			break ;
 		ft_putendl_fd(result, fd[1]);
 	}
@@ -48,13 +48,13 @@ void	ft_herdoc(t_commande *cmd, char **env, t_list *env_list)
 	if (cmd->flags[0] == NULL)
 		return ;
 	dup2(fd[0], STDIN_FILENO);
-	if (cmd->output->first_token != NULL)
+	if (cmd->redi->first_token != NULL)
 	{
-		if (cmd->output->first_token->token == T_OUT)
-			temp_fd = open(cmd->output->first_token->value, O_CREAT | O_RDWR | \
+		if (cmd->redi->first_token->token == T_OUT)
+			temp_fd = open(cmd->redi->first_token->value, O_CREAT | O_RDWR | \
 				O_TRUNC, 0644);
 		else
-			temp_fd = open(cmd->output->first_token->value, O_CREAT | O_RDWR | \
+			temp_fd = open(cmd->redi->first_token->value, O_CREAT | O_RDWR | \
 				O_APPEND, 0644);
 		dup2(temp_fd, STDOUT_FILENO);
 	}
@@ -106,7 +106,7 @@ void	ft_redirect_output_2(t_commande *cmd, char **env, t_list *env_list)
 	int		fd;
 	char	*path;
 
-	fd = open(cmd->output->first_token->value, O_CREAT | O_RDWR | O_APPEND, 0644);
+	fd = open(cmd->redi->first_token->value, O_CREAT | O_RDWR | O_APPEND, 0644);
 	if (cmd->flags[0] == NULL)
 		return ;
 	else
@@ -134,7 +134,7 @@ void	redirect_input(t_commande *cmd, char **env, t_list *env_list)
 	int		fd;
 	char	*path;
 
-	if (cmd->input->first_token->value == NULL)
+	if (cmd->redi->first_token->value == NULL)
 		return ;
 	fd = open_input_files(cmd);
 	if (fd == -1)

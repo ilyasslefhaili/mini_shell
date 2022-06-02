@@ -140,13 +140,13 @@ int check_for_redirection(t_commande *command)
 	int	fd;
 
 	fd = 1;
-	if (command->output->first_token != NULL)
+	if (command->redi->first_token != NULL)
 	{
-		if (command->output->first_token->token == T_OUT)
-			fd = open (command->output->first_token->value, O_RDWR | O_CREAT \
+		if (command->redi->first_token->token == T_OUT)
+			fd = open (command->redi->first_token->value, O_RDWR | O_CREAT \
 				| O_TRUNC, 0644);
 		else
-			fd = open (command->output->first_token->value, O_RDWR | O_CREAT \
+			fd = open (command->redi->first_token->value, O_RDWR | O_CREAT \
 				| O_APPEND, 0644);
 	}
 	return (fd);
@@ -180,13 +180,13 @@ void	ft_env(t_commande *command, t_list *env_list)
 	int	fd;
 
 	fd = STDOUT_FILENO;
-	if (command->output->first_token != NULL)
+	if (command->redi->first_token != NULL)
 	{
-		if (command->output->first_token->token == T_OUT)
-			fd = open(command->output->first_token->value, O_CREAT | O_WRONLY \
+		if (command->redi->first_token->token == T_OUT)
+			fd = open(command->redi->first_token->value, O_CREAT | O_WRONLY \
 				| O_TRUNC, 0644);
 		else
-			fd = open(command->output->first_token->value, O_CREAT | O_WRONLY \
+			fd = open(command->redi->first_token->value, O_CREAT | O_WRONLY \
 				| O_APPEND, 0644);
 	}
 	while (env_list)

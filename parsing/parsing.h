@@ -35,8 +35,7 @@ typedef struct t_token_head{
 typedef struct minishellpars{
 	char					**flags;
 	struct minishellpars	*next_comande;
-	t_token_head			*output;
-	t_token_head			*input;
+	t_token_head			*redi;
 }t_commande;
 
 # include <stdlib.h>

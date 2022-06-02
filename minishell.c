@@ -211,20 +211,20 @@ void	exec_node(t_commande *command, char **env, t_list *env_list,
 	i = 0;
 	if (check_built_in_commands(command, env_list, export_list, flag) == false)
 	{
-		if (command->input->first_token != NULL)
+		if (command->redi->first_token != NULL)
 		{
 			// while (command->input->first_token)
 			// {
-				if (command->input->first_token->token == T_HERDOC)
+				if (command->redi->first_token->token == T_HERDOC)
 					ft_herdoc(command, env, env_list);
 				else
 					redirect_input(command, env, env_list);
 				// command->input->first_token = command->input->first_token->next;
 			// }
 		}
-		else if (command->output->first_token != NULL)
+		else if (command->redi->first_token != NULL)
 		{
-			if (command->output->first_token->token == T_OUT)
+			if (command->redi->first_token->token == T_OUT)
 				ft_redirect_output(command, env, env_list);
 			else
 				ft_redirect_output_2(command, env, env_list);
@@ -327,11 +327,11 @@ void replace_symbol_by_val(char **s, t_list *env_list)
 int open_output_files(t_commande *command)
 {
 	int fd;
-	while (command->output->first_token != NULL)
+	while (command->redi->first_token != NULL)
 	{
-		if (command->output->first_token->token == T_OUT)
-			fd = open(command->output->first_token->value, O_CREAT | O_RDWR | O_TRUNC , 0644);
-		command->output->first_token = command->output->first_token->next;
+		if (command->redi->first_token->token == T_OUT)
+			fd = open(command->redi->first_token->value, O_CREAT | O_RDWR | O_TRUNC , 0644);
+		command->redi->first_token = command->redi->first_token->next;
 	}
 	return (fd);
 }
@@ -339,11 +339,11 @@ int open_output_files(t_commande *command)
 int open_input_files(t_commande *command)
 {
 	int fd;
-	while (command->input->first_token != NULL)
+	while (command->redi->first_token != NULL)
 	{
-		if (command->input->first_token->token == T_IN)
-			fd = open(command->input->first_token->value, O_RDONLY , 0644);
-		command->input->first_token = command->input->first_token->next;
+		if (command->redi->first_token->token == T_IN)
+			fd = open(command->redi->first_token->value, O_RDONLY , 0644);
+		command->redi->first_token = command->redi->first_token->next;
 	}
 	return (fd);
 }

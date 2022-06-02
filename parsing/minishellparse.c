@@ -50,39 +50,6 @@ void	ft_add_node(t_head_c *head, t_commande *commande)
 	commande->next_comande = NULL;
 }
 
-void ft_free(t_head_c *head)
-{
-	t_commande	*temp;
-	t_token		*t;
-	int			i;
-
-	while (head->first_c != NULL)
-	{
-		temp = head->first_c;
-		while (temp->input->first_token)
-		{
-			t = temp->input->first_token;
-			temp->input->first_token = temp->input->first_token->next;
-			free(t);
-		}
-		free(temp->input->first_token);
-		i = 0;
-		while (temp->flags[i])
-		{
-			free(temp->flags[i]);
-			i++;
-		}
-		free(temp->flags[i]);
-		while (temp->output->first_token)
-		{
-			t = temp->output->first_token;
-			temp->output->first_token = temp->output->first_token->next;
-			free(t);
-		}
-		head->first_c = head->first_c->next_comande;
-		free(temp);
-	}
-}
 
 char	**ft_replace(char **av, int i, char *value)
 {
@@ -117,10 +84,8 @@ int		ft_rederictions(t_commande *re, t_token *token)
 {
 	if (ft_syntax(token->value, token) == 1)
 		return (1);
-	if (token->token == 1 || token->token == 3)
-		ft_add_red(re->input, token);
 	else
-		ft_add_red(re->output, token);
+		ft_add_red(re->redi, token);
 	return (0);
 }
 
@@ -136,28 +101,38 @@ int		ft_check_pipe(t_lexer *lexer, t_token *token, int k)
 	return (0);
 }
 
+int	ft_check_token(t_token *token, t_commande *re, int *i)
+{
+	if (token->token == 0)
+	{
+		if (ft_syntax(token->value, token) == 1)
+			return (1);
+		re->flags = ft_replace(re->flags, *i, token->value);
+		*i += 1;
+		free(token);
+	}
+	else if (token->token >= 1 && token->token <= 4)
+	{
+		if (ft_rederictions(re, token) == 1)
+			return (1);
+	}
+	return (0);
+}
+
 int		ft_fill_node(t_commande *re, t_lexer *lexer, t_list *env_list)
 {
-	int			i;
 	int			k;
+	int			i;
 	t_token		*token;
 
 	token = ft_get_next_token(lexer, env_list);
-	i = 1;
 	k = 0;
+	i = 1;
 	while (token)
 	{
-		if (token->token == 0)
+		if (token->token < 5)
 		{
-			if (ft_syntax(token->value, token) == 1)
-				return (1);
-			re->flags = ft_replace(re->flags, i, token->value);
-			i++;
-			free(token);
-		}
-		else if (token->token >= 1 && token->token <= 4)
-		{
-			if (ft_rederictions(re, token) == 1)
+			if (ft_check_token(token, re, &i) == 1)
 				return (1);
 		}
 		else if (token->token == 5)
@@ -177,10 +152,8 @@ int	ft_add_commande(t_head_c *head, t_lexer *lexer, t_list *env_list)
 	t_commande	*re;
 
 	re = malloc(sizeof(t_commande));
-	re->input = malloc(sizeof(t_token_head));
-	re->input->first_token = NULL;
-	re->output = malloc(sizeof(t_token_head));
-	re->output->first_token = NULL;
+	re->redi = malloc(sizeof(t_token_head));
+	re->redi->first_token = NULL;
 	re->flags = malloc(sizeof(char *));
 	re->flags[0] = NULL;
 	if (ft_fill_node(re, lexer, env_list) == 1)
@@ -201,9 +174,8 @@ t_head_c	*ft_get_for_exec(char *content, t_list *env_list)
 	while (lexer->content[lexer->i])
 	{
 		s = ft_add_commande(head_of_commande, lexer, env_list);
-		if (s == 1)	
+		if (s == 1)
 			return (NULL);
 	}
-	system("leaks minishell");
 	return (head_of_commande);
 }
