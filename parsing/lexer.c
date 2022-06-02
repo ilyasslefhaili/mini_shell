@@ -133,7 +133,6 @@ char	*ft_get_value(t_lexer *lexer, t_list *env_list)
 		else
 		{
 			s = ft_get_str_without_quote(lexer, env_list);
-			system("leaks minishell");
 			if (s == NULL)
 				return (NULL);
 			temp = str;
@@ -196,6 +195,15 @@ char	*ft_get_str_without_quote(t_lexer *lexer, t_list *env_list)
 				}
 			}
 		}
+		else if (lexer->c == '\\' && lexer->i < ft_strlen(lexer->content) - 1)
+		{
+			ft_advance(lexer);
+			temp = str;
+			str = ft_strjoin(str, &lexer->c);
+			ft_advance(lexer);
+		}
+		else if (lexer->c == '\\' && lexer->i == ft_strlen(lexer->content) - 1)
+			return (NULL);
 		else
 		{
 			temp = str;
@@ -255,6 +263,13 @@ char	*ft_collect_string(t_lexer *lexer, char c, t_list *env_list)
 					free(temp);
 				}
 			}
+		}
+		else if (lexer->c == '\\' && lexer->i < ft_strlen(lexer->content) - 1 && (lexer->content[lexer->i + 1] == '\\' || lexer->content[lexer->i + 1] == c))
+		{
+			ft_advance(lexer);
+			temp = str;
+			str = ft_strjoin(str, &lexer->c);
+			ft_advance(lexer);
 		}
 		else
 		{
