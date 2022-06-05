@@ -84,6 +84,8 @@ int		ft_rederictions(t_commande *re, t_token *token)
 {
 	if (ft_syntax(token->value, token) == 1)
 		return (1);
+	else if (token->token == T_HERDOC)
+		ft_add_red(re->herdoc, token);
 	else
 		ft_add_red(re->redi, token);
 	return (0);
@@ -153,6 +155,8 @@ int	ft_add_commande(t_head_c *head, t_lexer *lexer, t_list *env_list)
 
 	re = malloc(sizeof(t_commande));
 	re->redi = malloc(sizeof(t_token_head));
+	re->herdoc = malloc(sizeof(t_token_head));
+	re->herdoc->first_token = NULL;
 	re->redi->first_token = NULL;
 	re->flags = malloc(sizeof(char *));
 	re->flags[0] = NULL;

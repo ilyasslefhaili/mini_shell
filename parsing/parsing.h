@@ -36,6 +36,7 @@ typedef struct minishellpars{
 	char					**flags;
 	struct minishellpars	*next_comande;
 	t_token_head			*redi;
+	t_token_head			*herdoc;
 }t_commande;
 
 # include <stdlib.h>
