@@ -156,6 +156,11 @@ char	*ft_after_dollar(t_lexer *lexer, t_list *env_list)
 		str = ft_itoa(get_exit_code());
 		ft_advance(lexer);
 	}
+	else if (ft_isalnum(lexer->c) != 0)
+	{
+		ft_advance(lexer);
+		return (ft_strdup(""));
+	}
 	else
 	{
 		s = ft_strdup("");
